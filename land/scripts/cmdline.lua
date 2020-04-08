@@ -1,6 +1,6 @@
 _ENV = setenv(...,_ENV);
 
-console.write("hello world! 你好，世界！");
+print("hello world! 你好，世界！");
 
 local chatTrigger = common.CreateTrigger();
 common.TriggerRegisterPlayerChatEvent(chatTrigger, common.Player(0), "-", false);

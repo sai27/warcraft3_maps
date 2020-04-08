@@ -6,6 +6,4 @@ runtime.sleep = true;
 
 common = require ("jass.common");
 
-for i, v in pairs(common) do
-    console.write(tostring(i));
-end
+print = console.write;
