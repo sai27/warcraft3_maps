@@ -3,9 +3,8 @@ _ENV = setenv(...,_ENV);
 print("hello world! 你好，世界！");
 
 local chatTrigger = common.CreateTrigger();
-common.TriggerRegisterPlayerChatEvent(chatTrigger, common.Player(0), "-", false);
 
-local chatEvent = function()
+local chatAction = function()
     local str = common.GetEventPlayerChatString();
     str = string.trim(str);
     if (string.startswith(str,"-")) then
@@ -31,5 +30,7 @@ local chatEvent = function()
     end
 end
 
-common.TriggerAddAction(chatTrigger, chatEvent);
+common.TriggerAddAction(chatTrigger, chatAction);
+
+common.TriggerRegisterPlayerChatEvent(chatTrigger, common.Player(0), "-", false);
 

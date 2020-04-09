@@ -7,15 +7,13 @@ fog = {
     name = "fog",
     help = "设置战争迷雾(int opt)",
     f = function (option)
-        option = tonumber(option);
-        if (option == 0) then
+        option = tonumber(option) or 0;
+        if (option ~= 0) then
             common.FogEnable(true);
             common.FogMaskEnable(true);
-            print("a");
         else
             common.FogEnable(false);
             common.FogMaskEnable(false);
-            print("b");
         end
     end
 };
@@ -81,7 +79,7 @@ createcube = {
 createcircle = {
     name = "create unit circle",
     help = "创建圆形阵(name, playeridx, left, bottom, xcount, ycount, delta, angle, edgecount, to)",
-    -- -createcircle hgry 0 0 0 600 120 120 -1 3 circle
+    -- -createcircle hrif 0 0 0 500 120 120 -1 2 circle
     f = function (name, playeridx, x, y, radius, deltaradius, deltacircle, angle, edgecount, to)
         name        = name or "hfoo";
         playeridx   = tonumber(playeridx) or 0;
@@ -106,7 +104,7 @@ createcircle = {
             
             for i=1, _count do
                 local _angle = _rad*i;
-                print (_angle);
+            --    print (_angle);
                 local _x = math.cos(_angle)*radius;
                 local _y = math.sin(_angle)*radius;
                 _x = _x + x;
@@ -140,10 +138,14 @@ createcircle = {
 
 orderpoint = {
     name = "order point",
-    help = "发布命令 指定点(name, order, x, y)",
+    help = "发布命令 指定点(set, order, x, y)",
+    -- -createcube hsor 0 0 0 10 10 120 270 2 cube
     -- -orderpoint cube move 100 100
-    f = function(name, order, x, y)
-        local units = _globalunits[name];
+    f = function(set, order, x, y)
+        x = tonumber(x) or 0;
+        y = tonumber(y) or 0;
+
+        local units = _globalunits[set];
         if (units == nil) then
             return;
         end
@@ -153,3 +155,197 @@ orderpoint = {
         end
     end
 };
+
+orderpointoffset = {
+    name = "order point offset",
+    help = "发布命令 偏移点(set, order, offset, angle, reverse)",
+    -- -createcube hsor 0 0 0 10 10 120 0 2 cube
+    -- -createcircle hrif 0 0 0 500 120 120 -1 2 circle
+    -- -orderpointoffset cube move 100 0 true
+    f = function(set, order, offset, angle, reverse)
+        offset      = tonumber(offset) or 0;
+        angle       = tonumber(angle) or 0;
+        reverse     = reverse or "false";
+
+        angle = math.rad(angle);
+
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+        
+        local _count = #units;
+        for i=1,_count do
+            local v = nil;
+            if (reverse == "false") then
+                v = units[i];
+            else
+                v = units[_count-i+1];
+                print("true")
+            end
+
+            local _x = common.GetUnitX(v);
+            local _y = common.GetUnitY(v);
+            _x = _x + offset * math.cos(angle);
+            _y = _y + offset * math.sin(angle);
+            common.IssuePointOrder(v, order, _x, _y);
+        end
+    end
+};
+
+orderself = {
+    name = "order point offset",
+    help = "发布命令 自身(set, order)",
+    -- -orderself cube holdposition
+    f = function(set, order)
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+
+        for i,v in ipairs(units) do
+            common.IssueImmediateOrder(v, order);
+        end
+    end
+}
+
+-- 发布命令-目标
+ordertarget = {
+    name = "order point offset",
+    help = "发布命令 自身(set, order)",
+    -- -ordertarget
+    f = function(set1, set2, order)
+        local units1 = _globalunits[set1];
+        if (units1 == nil) then
+            return;
+        end
+
+        local units2 = _globalunits[set2];
+        if (units2 == nil) then
+            return;
+        end
+
+        if (#units1 ~= #units2) then
+            return;
+        end
+        
+        local _count = #units1;
+        for i=1,_count do
+            common.IssueTargetOrder(units1[i], order, units2[i]);
+        end
+    end
+}
+
+ally = {
+    name = "player ally setting",
+    help = "设置结盟状态(player1, player2, ally)",
+    -- -ally 0 1 true
+    f = function(player1, player2, ally)
+        player1 = tonumber(player1) or 0;
+        player2 = tonumber(player1) or 0;
+        ally = ally or "false";
+
+        if (ally == "false") then
+            common.SetPlayerAlliance(common.Player(player1), common.Player(player2), common.ConvertAllianceType(0), false);
+        else
+            common.SetPlayerAlliance(common.Player(player1), common.Player(player2), common.ConvertAllianceType(0), true);
+        end
+        
+    end
+}
+
+playanim = {
+    name = "player anim",
+    help = "播放动画(set, anim, type) type 0:normal type 1:rare",
+    f = function (set, anim, type)
+        anim = anim or "stand";
+        type = tonumber(type) or 0;
+
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+
+        for i,v in ipairs(units) do
+            common.SetUnitAnimationWithRarity(v, anim, common.ConvertRarityControl(type));
+        end
+    end
+}
+
+movespeed = {
+    name = "move speed",
+    help = "设置移动速度(set, speed)",
+    f = function (set, speed)
+        speed = tonumber(speed);
+
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+
+        for i,v in ipairs(units) do
+            if (speed) then
+                common.SetUnitMoveSpeed(v, speed);
+            else
+                common.SetUnitMoveSpeed(v, common.GetUnitDefaultMoveSpeed(v));
+            end
+        end
+    end
+}
+
+-- 设置时间与流逝速度
+time = {
+    name = "time",
+    help = "设置时间(time，scale)",
+    f = function (time,scale)
+        common.SetFloatGameState(common.ConvertFGameState(2),time);
+        common.SetTimeOfDayScale(scale);
+    end
+}
+
+-- 设置科技
+
+tech = {
+    name = "tech",
+    help = "设置科技(time，scale)",
+    f = function (playerid,name, level)
+        common.SetPlayerTechResearched(common.Player(playerid),base.string2id(name),level);
+    end
+}
+
+-- 删除技能
+delability = {
+    name = "delability",
+    help = "删除技能(set,name)",
+    f = function (set,name)
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+
+        for i,v in ipairs(units) do
+            common.UnitRemoveAbility(v, base.string2id(name));
+        end
+    end
+}
+
+-- 设置属性
+setstate = {
+    name = "setstate",
+    help = "设置属性(set,idx,value)",
+    f = function (set,idx,value)
+        idx = tonumber(idx) or 0;
+        value = tonumber(value) or 100;
+
+        local units = _globalunits[set];
+        if (units == nil) then
+            return;
+        end
+
+        for i,v in ipairs(units) do
+            common.SetUnitState(v, common.ConvertUnitState(idx),value);
+        end
+    end
+}
+
+-- 删除选择的单位
