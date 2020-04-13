@@ -1,6 +1,6 @@
 _ENV = setenv(...,_ENV);
 
-print("hello world! 你好，世界！");
+--print("hello world! 你好，世界！");
 
 local chatTrigger = common.CreateTrigger();
 

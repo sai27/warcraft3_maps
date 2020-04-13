@@ -11,12 +11,7 @@ common.TriggerAddAction(initTrigger, initAction);
 common.TriggerRegisterTimerEvent(initTrigger,0, false);
 
 
-
--- Esc触发
-local actionExeTrigger = common.CreateTrigger();
-
---一系列命令集合
-local actionExeAction = function()
+local famerfight = function()
     local x1a = -120;
     local x2a = -200;
     local x3a = -200;
@@ -128,6 +123,54 @@ local actionExeAction = function()
     handler.ordertarget.f("v_unec", "v_hpea", "cripple");
     -- 诅咒
     handler.ordertarget.f("v_uban", "v_hpea", "curse");
+end
+
+local training = function()
+    -- 步兵
+    handler.createcube.f("hfoo", 0, -360, -600, 6, 10, 120, 270, -1, "v_hfoo");
+    --handler.playanim.f("v_hfoo","stand",0);
+    common.TriggerSleepAction(20);
+    handler.orderself.f("v_hfoo","defend");
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,315); -- 向右看齐
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,270); -- 向前看
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,0); -- 向右转
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,270); --向左转
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,90); --向后转
+    common.TriggerSleepAction(1);
+    handler.orderpointoffset.f("v_hfoo", "move", 1,270); --向后转
+    common.TriggerSleepAction(1.8);
+    handler.orderself.f("v_hfoo","undefend");
+    handler.playanim.f("v_hfoo","stand",0);
+    common.TriggerSleepAction(0.9);
+    handler.orderself.f("v_hfoo","defend");
+    
+end
+
+function word()
+    -- 步兵
+    --createcircle hrif 0 0 0 500 120 120 -1 2 circle
+    handler.createcircle.f("nech", 0, 0, 0, 500, 120, 120, -1, 2, "v_nech");
+    handler.orderself.f("v_nech","holdposition");
+    handler.playanim.f("v_nech","stand",0);
+
+ --[[   local units = handler._globalunits["v_hfoo"];
+    for i,v in ipairs(units) do
+        common.TriggerSleepAction(0.001);
+        common.IssueImmediateOrder(v, "defend");
+    end]]
+end
+
+-- Esc触发
+local actionExeTrigger = common.CreateTrigger();
+
+--一系列命令集合
+local actionExeAction = function()
+    word();    
 end
 
 common.TriggerAddAction(actionExeTrigger, actionExeAction);
